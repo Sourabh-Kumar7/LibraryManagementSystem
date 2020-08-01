@@ -398,7 +398,7 @@ void displayAllStudent()
 
 	while(fp.read((char*)&s,sizeof(Student)))
 	{
-		st.report();
+		s.report();
 	}
 
 	fp.close();
@@ -504,64 +504,7 @@ void adminMenu()
 		case 7 :
 			displayAllBooks();
 			break;
-		case 8 : #include<bits/stdc++.h>
-#include<conio.h>
-using namespace std;
-
-
-//-------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------
-
-void introduction()
-{
-	system("clear");
-	cout<<"\t\tLIBRARY MANAGEMENT SYSYTEM\n\n";
-	cout<<"\t\t----AIT PUNE\n";
-	getch();
-}
-
-//-------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------
-
-int main()
-{
-
-	int choice;
-	introduction();
-	do
-	{
-		system("clear");
-		cout<<"\n\n\t\t\tMAIN MENU";
-		cout<<"\n\t\t1. BOOK ISSUE";
-		cout<<"\n\t\t2. BOOK DEPOSIT";
-		cout<<"\n\t\t3. ADMINISTARTIVE MENU";
-		cout<<"\n\t\t4. EXIT";
-		cout<<"\n\n Please select your choice\n";
-		cin>>choice;
-		switch(choice)
-		{
-			case 1 :
-			{
-				system("clear");
-				bookIssue();
-				break;
-			}
-			case 2 : 
-				bookDeposit();
-				break;
-			case 3 : 
-				adminMenu();
-				break;
-			case 4 : 
-				return 0;
-				break;
-			default :
-				cout<<"\a";
-				break;
-		} 
-	}while(choice!=4);
-	return 0;
-}
+		case 8 : 
 			system("clear");
 			cout<<"\n\n\tEnter the book no. : ";
 			cin>>num;
