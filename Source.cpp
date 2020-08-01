@@ -61,7 +61,7 @@ class Student
 {
 	int admissionNo;
 	string name;
-	char studentBookNo[6];
+	int studentBookNo;
 	int token;
 
 	public:
@@ -75,7 +75,7 @@ class Student
 			cout<<"\nEnter student name : ";
 			cin>>name;
 			token = 0;
-			studentBookNo[0]='/0';
+			studentBookNo=0;
 			cout<<"\n\nStudent successfully registered";
 			
 		}
@@ -104,7 +104,7 @@ class Student
 			return admissionNo;
 		}
 
-		char* returnStudentBookNo()
+		int returnStudentBookNo()
 		{
 			return studentBookNo;
 		}
@@ -124,9 +124,9 @@ class Student
 			token = 0;
 		}
 
-		void getStudentBookNo(char sbn[])
+		void getStudentBookNo(int n)
 		{
-			strcpy(studentBookNo,sbn);
+			studentBookNo=n;
 		}
 
 		void report()
@@ -247,7 +247,7 @@ void modifyBook()
 			b.showBook();
 			cout<<"\nEnter the new details of book\n";
 			b.modifyBook();
-			int pos =-1*sizeof(b);
+			unsigned long int pos =-1*sizeof(b);
 			fp.seekp(pos,ios::cur);
 			fp.write((char*)&b,sizeof(Book));
 			cout<<"\n\n\t Record Updated";
@@ -284,7 +284,7 @@ void modifyStudent()
 			s.showStudent();
 			cout<<"\nEnter the new details of the student\n";
 			s.modifyStudent();
-			int pos =-1*sizeof(s);
+			unsigned long int pos =-1*sizeof(s);
 			fp.seekp(pos,ios::cur);
 			fp.write((char*)&s,sizeof(Student));
 			cout<<"\n\n\t Record Updated";
@@ -318,7 +318,7 @@ void deleteStudent()
 	cin>>n;
 	fp.open("student.dat",ios::in|ios::out);
 	fp2.open("temp.dat",ios::out);
-	fp.seek(0,ios::beg);
+	fp.seekg(0,ios::beg);
 	while(fp.read((char*)&s,sizeof(Student)))
 	{
 		if(s.returnAdmissionNo()!=n)
@@ -358,7 +358,7 @@ void deleteBook()
 	fp.seekg(0,ios::beg);
 	while(fp.read((char*)&b,sizeof(Book)))
 	{
-		if(s.returnBookNo()!=n)
+		if(b.returnBookNo()!=n)
 		{
 			fp2.write((char*)&b,sizeof(Book));
 		}
@@ -438,8 +438,62 @@ void displayAllBooks()
 
 void bookIssue()
 {
-	cout<<"\n\nbook issue\n\n";
+	int m,n;
+	int found = 0;
+	int flag =0;
+
+	system("clear");
+	cout<<"\n\nBOOK ISSUE";
+	cout<<"\n\n\tEnter the student admission no. : ";
+	cin>>m;
+	fp.open("student.dat",ios::in|ios::out);
+	fp1.open("book.dat",ios::in|ios::out);
+	
+	while(fp.read((char*)&s,sizeof(Student)) && found ==0)
+	{
+		if(s.returnAdmissionNo()==m)
+		{
+			found = 1;
+			if(s.returnToken()==0)
+			{
+				cout<<"\n\nEnter the book no. : ";
+				cin>>n;
+
+				while(fp1.read((char*)&b,sizeof(Book)) && flag ==0)
+				{
+					if(b.returnBookNo()==n)
+					{
+						b.showBook();
+						flag=1;
+						s.addToken();
+						s.getStudentBookNo(b.returnBookNo());
+						unsigned long int pos = -1*sizeof(s);
+						fp.seekp(pos,ios::cur);
+						fp.write((char*)&s,sizeof(Student));
+						cout<<"\n\n\t Book issued successfully\n";
+						cout<<"\nPlease Note: Write the current date in backside of your book and submit within 15 days. Fine Rs. 5 for each day after 15 days period";
+					}
+				}
+				if(flag==0)
+				{
+					cout<<"\nBook no. doesn't exist";
+				}
+			}
+			else
+			{
+				cout<<"\nYou have not returned the last book\n";
+			}
+		}
+	}
+
+	if(found==0)
+	{
+		cout<<"\nStudent record doesn't exist";
+	}
+
 	getch();
+	fp.close();
+	fp1.close();			
 
 }
 
@@ -449,8 +503,66 @@ void bookIssue()
 
 void bookDeposit()
 {
-	cout<<"\nbook deposit\n\n";
+	int m,n;
+	bool found =0;
+	bool flag =0;
+	int day,fine;
+
+	system("clear");
+	cout<<"\n\n\tBOOK DEPOSIT";
+	cout<<"\n\n\tEnter the student admission no. : ";
+	cin>>m;
+
+	fp.open("student.dat",ios::in|ios::out);
+	fp1.open("book.dat",ios::in|ios::out);
+
+	while(fp.read((char*)&s,sizeof(Student)) && found ==0)
+	{
+		if(s.returnAdmissionNo()==m)
+		{
+			found=1;
+			if(s.returnToken()==1)
+			{
+				while(fp1.read((char*)&b,sizeof(Book)) && flag==0)
+				{
+					if(b.returnBookNo()==s.returnStudentBookNo())
+					{
+						b.showBook();
+						flag=1;
+						cout<<"\n\nBook deposited in no. of days";
+						cin>>day;
+						if(day>15)
+						{
+							fine=(day-15)*5;
+							cout<<"\n\nFine has to be deposited Rs. "<<fine;
+						}
+						s.resetToken();
+						unsigned long int pos=-1*sizeof(s);
+						fp.seekp(pos,ios::cur);
+						fp.write((char*)&s,sizeof(Student));
+						cout<<"\n\n\t Book deposited successfully";
+					}
+				}
+
+				if(flag==0)
+				{
+					cout<<"\nBook no. doesn't exist";
+				}
+			}
+			else
+			{
+				cout<<"\nNo book is issued";
+			}
+		}
+	}
+	if(found==0)
+	{
+		cout<<"\nStudent record doesn't exit";
+	}
+
 	getch();
+	fp.close();
+	fp1.close();
 
 }
 
